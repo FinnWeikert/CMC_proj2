@@ -190,7 +190,7 @@ class FiringRateController:
                 Wsc[i,j] = calculate_w(i,j,n_desc_str,n_asc_str)
         Win = np.zeros((50,50))
         for i in range(0, 49):
-            for j in range(1, 6):
+            for j in range(0, 49):
                 Win[i,j] = calculate_w(i,j,n_desc,n_asc)
 
         return self.dstate
