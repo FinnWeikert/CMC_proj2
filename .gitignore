@@ -33,7 +33,6 @@ logs/
 models/
 muscle_parameters/
 util/
-plot_results.py
 plotting_common.py
 requirements.txt
 setup_sim_env.py
