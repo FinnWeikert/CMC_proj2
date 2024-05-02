@@ -36,36 +36,48 @@ class FiringRateController:
         # vector of indexes for the CPG activity variables - modify this
         # according to your implementation
         self.all_v = range(self.n_neurons*2)
-
         pylog.warning(
             "Implement here the vectorization indexed for the equation variables")
+        self.rL = 2*np.arange(0,self.n_neurons)
+        self.rR = self.rL + 1
+        self.aL = 2*np.arange(self.n_neurons,self.n_neurons*2)
+        self.aR = self.aL + 1
+        self.all_r = np.concatenate([self.rL,self.rR])
+        self.all_a = np.concatenate([self.aL,self.aR])
 
         # muscle cells parameters
-        taum_a = self.pars.taum_a
-        taum_d = self.pars.taum_d
-        w_V2a2muscle = self.pars.w_V2a2muscle
+        self.n_joints = self.pars.n_joints
+        self.taum_a = self.pars.taum_a
+        self.taum_d = self.pars.taum_d
+        self.w_V2a2muscle = self.pars.w_V2a2muscle
         # conversion weight from muscle cell activity to muscle activations
-        act_strength = self.pars.act_strength
+        self.act_strength = self.pars.act_strength
 
         # CPG pars
-        I = self.pars.I
-        Idiff = self.pars.Idiff
-        n_asc = self.pars.n_asc
-        n_desc = self.pars.n_desc
-        tau = self.pars.tau
-        taua = self.pars.taua
-        b = self.pars.b
-        gamma = self.pars.gamma
-        w_inh = self.pars.w_inh
+        self.I = self.pars.I
+        self.Idiff = self.pars.Idiff
+        self.n_asc = self.pars.n_asc
+        self.n_desc = self.pars.n_desc
+        self.tau = self.pars.tau
+        self.taua = self.pars.taua
+        self.b = self.pars.b
+        self.gamma = self.pars.gamma
+        self.w_inh = self.pars.w_inh
 
         # stretch pars
-        w_stretch = self.pars.w_stretch
-        n_asc_str = self.pars.n_asc_str
-        n_desc_str = self.pars.n_desc_str
-        tau_str = self.pars.tau_str
+        self.w_stretch = self.pars.w_stretch
+        self.n_asc_str = self.pars.n_asc_str
+        self.n_desc_str = self.pars.n_desc_str
+        self.tau_str = self.pars.tau_str
 
         # noise pars
-        noise_sigma = self.pars.noise_sigma
+        self.noise_sigma = self.pars.noise_sigma
+
+        # Added by Tristan
+        self.gin = self.pars.gin
+        self.gss = self.pars.gss
+        self.gmc = self.pars.gmc
+        self.rho = self.pars.rho
 
         self.state = np.zeros([self.n_iterations, self.n_eq])  # equation state
         self.dstate = np.zeros([self.n_eq])  # derivative state
@@ -102,6 +114,35 @@ class FiringRateController:
         self.zeros8 = np.zeros(8)
         # pre-computed zero activity for the tail joint
         self.zeros2 = np.zeros(2)
+
+        def calculate_w(i, j, ndesc, nasc):
+            if i <= j and j - i <= ndesc:
+                return 1 / (j - i + 1)
+            elif i > j and i - j <= nasc:
+                return 1 / (i - j + 1)
+            else:
+                return 0
+            
+        def calculate_wcm(i, j, ncm):
+            if ncm*i <= j and ncm*(i+1) - 1 >= j:
+                return 1
+            else:
+                return 0
+
+        self.Wsc = np.zeros((self.n_neurons,self.n_neurons))
+        for i in range(self.n_neurons):
+            for j in range(self.n_neurons):
+                self.Wsc[i,j] = calculate_w(i,j,self.n_desc_str,self.n_asc_str)
+
+        self.Win = np.zeros((self.n_neurons,self.n_neurons))
+        for i in range(self.n_neurons):
+            for j in range(self.n_neurons):
+                self.Win[i,j] = calculate_w(i,j,self.n_desc,self.n_asc)
+
+        self.Wcm = np.zeros((self.n_muscle_cells,self.n_neurons))
+        for i in range(self.n_muscle_cells):
+            for j in range(self.n_neurons):
+                self.Wcm[i,j] = calculate_wcm(i,j,5) # ncm = 5
 
     def get_ou_noise_process_dw(self, timestep, x_prev, sigma):
         """
@@ -158,9 +199,11 @@ class FiringRateController:
         even indexes (0,2,4,...) = left muscle activations
         odd indexes (1,3,5,...) = right muscle activations
         """
-        return np.zeros(
-            2 *
-            self.n_muscle_cells)  # here you have to final active muscle equations for the 10 joints
+        activation = self.act_strength*self.state[iteration][self.all_muscles]
+        #return np.zeros(
+        #    2 *
+        #    self.n_muscle_cells)  # here you have to final active muscle equations for the 10 joints
+        return activation
 
     def ode_rhs(self,  _time, state, pos=None):
         """Network_ODE
@@ -177,21 +220,17 @@ class FiringRateController:
             Returns derivative of state
         """
         # Implement (11) here
-        def calculate_w(i, j, ndesc, nasc):
-            if i <= j and j - i <= ndesc:
-                return 1 / (j - i + 1)
-            elif i > j and i - j <= nasc:
-                return 1 / (i - j + 1)
-            else:
-                return 0
-        Wsc = np.zeros((50,50))
-        for i in range(0,49):
-            for j in range(0,49):
-                Wsc[i,j] = calculate_w(i,j,n_desc_str,n_asc_str)
-        Win = np.zeros((50,50))
-        for i in range(0, 49):
-            for j in range(0, 49):
-                Win[i,j] = calculate_w(i,j,n_desc,n_asc)
+        # coupling for rL
+        xL = self.I-self.b*state[self.aL]-self.gin*np.matmul(self.Win,state[self.rR])
+        FR = np.sqrt(np.maximum(xL,0))
+        #coupling for rR
+        xR = self.I-self.b*state[self.aR]-self.gin*np.matmul(self.Win,state[self.rL])
+        FL = np.sqrt(np.maximum(xR,0))
 
+        self.dstate[self.rL] = -state[self.rL] + FL
+        self.dstate[self.rR] = -state[self.rR] + FR
+
+        self.dstate[self.all_a] = -state[self.all_a] + self.rho*state[self.all_r]
+        self.dstate[self.all_muscles] = self.gmc*np.concatenate([np.matmul(self.Wcm,state[self.rL]),np.matmul(self.Wcm,state[self.rR])])*(1-state[self.all_muscles])/self.taum_a-state[self.all_muscles]/self.taum_d
         return self.dstate
 
