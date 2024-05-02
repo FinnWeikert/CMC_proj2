@@ -6,7 +6,7 @@ import farms_pylog as pylog
 
 
 def exercise3():
-
+#tristan
     pylog.info("Ex 3")
     pylog.info("Implement exercise 3")
     log_path = './logs/exercise3/'
