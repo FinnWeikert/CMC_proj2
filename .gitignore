@@ -28,7 +28,6 @@ farms_amphibious/
 farms_core/
 farms_sim/
 farms_mujoco/
-firing_rate_controller.py
 logs/
 models/
 muscle_parameters/
