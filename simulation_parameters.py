@@ -80,6 +80,11 @@ class SimulationParameters:
         # noise pars
         self.noise_sigma = 0  # sigma of the OU noise process
 
+        # Added by Tristan
+        self.gin = 2
+        self.gss = 0
+        self.gmc = 0.3
+        self.rho = 0.5
         # NOTE: This overrides the previous declarations
         self.__dict__.update(kwargs)
 
