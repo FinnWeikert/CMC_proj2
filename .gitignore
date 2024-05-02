@@ -20,3 +20,20 @@ rad.json
 *.flf
 #Test results file
 TestResults.xml
+.DS_Store
+*.pyc
+example_multiple.py
+example_single.py
+farms_amphibious/
+farms_core/
+farms_sim/
+farms_mujoco/
+firing_rate_controller.py
+logs/
+models/
+muscle_parameters/
+util/
+plot_results.py
+plotting_common.py
+requirements.txt
+setup_sim_env.py
