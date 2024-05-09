@@ -242,13 +242,10 @@ class FiringRateController:
         xR = self.I - self.b*state[self.aR] - self.gin*np.matmul(self.Win, state[self.rL])
         FR = np.sqrt(np.maximum(xR,0))
 
-        self.dstate[self.rL] = (-state[self.rL] + FL) / self.tau   # oublié les tau?
+        self.dstate[self.rL] = (-state[self.rL] + FL) / self.tau
         self.dstate[self.rR] = (-state[self.rR] + FR) / self.tau
 
-        self.dstate[self.all_a] = (-state[self.all_a] + self.rho*state[self.all_r]) / self.taua # oublié tau?
-    
-        #self.dstate[self.all_muscles] = self.gmc*np.concatenate([np.matmul(self.Wcm,state[self.rL]),np.matmul(self.Wcm,state[self.rR])]) \
-        #                                        *(1-state[self.all_muscles])/self.taum_a-state[self.all_muscles]/self.taum_d
+        self.dstate[self.all_a] = (-state[self.all_a] + self.rho*state[self.all_r]) / self.taua
         
         self.dstate[self.muscle_l] = self.gmc * np.matmul(self.Wcm, state[self.rL]) \
                                               * (1-state[self.muscle_l])/self.taum_a \
@@ -256,20 +253,7 @@ class FiringRateController:
         self.dstate[self.muscle_r] = self.gmc * np.matmul(self.Wcm, state[self.rR]) \
                                         * (1-state[self.muscle_r])/self.taum_a \
                                         - state[self.muscle_r]/self.taum_d
-        if _time == 0.01:
-            d = 1       
-        if _time == 0.1:
-             d = 1
-        if _time == 0.49:
-            d = 1
-        if _time == 1:
-            d = 1
-        if _time == 1.5:
-            d = 1
-        if _time == 3:
-            d = 1
         
-
         return self.dstate
 
 
