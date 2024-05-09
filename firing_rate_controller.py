@@ -143,7 +143,7 @@ class FiringRateController:
         self.Win = np.zeros((self.n_neurons,self.n_neurons))
         for i in range(self.n_neurons):
             for j in range(self.n_neurons):
-                self.Win[i,j] = calculate_w(i,j,self.n_asc,self.n_desc) # !! intetionally switched order n_asc and n_desc !!
+                self.Win[i,j] = calculate_w(i,j,self.n_desc,self.n_asc)
 
         self.Wcm = np.zeros((self.n_muscle_cells,self.n_neurons))
         for i in range(self.n_muscle_cells):
@@ -229,10 +229,10 @@ class FiringRateController:
         """
         # Implement (11) here
         # coupling for rL
-        xL = self.I - self.b*state[self.aL] - self.gin*np.dot(self.Win, state[self.rR])
+        xL = self.I - self.b*state[self.aL] - self.gin*np.dot(self.Win.T, state[self.rR]) # Transpose is wierd...
         FL = np.sqrt(np.maximum(xL,0))
         # coupling for rR
-        xR = self.I - self.b*state[self.aR] - self.gin*np.dot(self.Win, state[self.rL])
+        xR = self.I - self.b*state[self.aR] - self.gin*np.dot(self.Win.T, state[self.rL])
         FR = np.sqrt(np.maximum(xR,0))
 
         self.dstate[self.rL] = (-state[self.rL] + FL) / self.tau
@@ -246,10 +246,6 @@ class FiringRateController:
         self.dstate[self.muscle_r] = self.gmc * np.dot(self.Wcm, state[self.rR]) \
                                         * (1-state[self.muscle_r])/self.taum_a \
                                         - state[self.muscle_r]/self.taum_d
-        if _time==1:
-            d=1
-        if _time==3:
-            d=1
         
         return self.dstate
 
