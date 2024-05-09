@@ -176,6 +176,8 @@ class FiringRateController:
         self.state[iteration+1, :] = self.state[iteration, :] + \
             timestep*self.f(time, self.state[iteration], pos=pos)
         d = 1
+
+        deriv = self.f(time, self.state[iteration], pos=pos)
         self.test.append(np.concatenate([
             self.zeros8,  # the first 4 passive joints
             self.motor_output(iteration),  # the active joints
@@ -243,7 +245,7 @@ class FiringRateController:
         self.dstate[self.rL] = (-state[self.rL] + FL) / self.tau   # oublié les tau?
         self.dstate[self.rR] = (-state[self.rR] + FR) / self.tau
 
-        self.dstate[self.all_a] = (-state[self.all_a] + self.rho*state[self.all_r])/self.taua # oublié tau?
+        self.dstate[self.all_a] = (-state[self.all_a] + self.rho*state[self.all_r]) / self.taua # oublié tau?
     
         # self.dstate[self.all_muscles] = self.gmc*np.concatenate([np.matmul(self.Wcm,state[self.rL]),np.matmul(self.Wcm,state[self.rR])]) \
         #                                         *(1-state[self.all_muscles])/self.taum_a-state[self.all_muscles]/self.taum_d
@@ -254,8 +256,20 @@ class FiringRateController:
         self.dstate[self.muscle_r] = self.gmc * np.matmul(self.Wcm, state[self.rR]) \
                                         * (1-state[self.muscle_r])/self.taum_a \
                                         - state[self.muscle_r]/self.taum_d
-        if _time > 1.5:
-             d=1
+        if _time == 0.01:
+            d = 1       
+        if _time == 0.1:
+            d = 1
+        if _time == 0.49:
+            d = 1
+        if _time == 1:
+            d = 1
+        if _time == 1.5:
+            d = 1
+        if _time == 3:
+            d = 1
+        
+
         return self.dstate
 
 
