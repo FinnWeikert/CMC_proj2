@@ -143,7 +143,7 @@ class FiringRateController:
         self.Win = np.zeros((self.n_neurons,self.n_neurons))
         for i in range(self.n_neurons):
             for j in range(self.n_neurons):
-                self.Win[i,j] = calculate_w(i,j,self.n_desc,self.n_asc)
+                self.Win[i,j] = calculate_w(i,j,self.n_asc,self.n_desc) # !! intetionally switched order n_asc and n_desc !!
 
         self.Wcm = np.zeros((self.n_muscle_cells,self.n_neurons))
         for i in range(self.n_muscle_cells):
@@ -176,13 +176,6 @@ class FiringRateController:
         self.state[iteration+1, :] = self.state[iteration, :] + \
             timestep*self.f(time, self.state[iteration], pos=pos)
         d = 1
-
-        deriv = self.f(time, self.state[iteration], pos=pos)
-        self.test.append(np.concatenate([
-            self.zeros8,  # the first 4 passive joints
-            self.motor_output(iteration),  # the active joints
-            self.zeros2  # the last (tail) passive joint
-        ]))
 
         return np.concatenate([
             self.zeros8,  # the first 4 passive joints
@@ -236,40 +229,27 @@ class FiringRateController:
         """
         # Implement (11) here
         # coupling for rL
-        xL = self.I - self.b*state[self.aL] - self.gin*np.matmul(self.Win, state[self.rR])
+        xL = self.I - self.b*state[self.aL] - self.gin*np.dot(self.Win, state[self.rR])
         FL = np.sqrt(np.maximum(xL,0))
         # coupling for rR
-        xR = self.I - self.b*state[self.aR] - self.gin*np.matmul(self.Win, state[self.rL])
+        xR = self.I - self.b*state[self.aR] - self.gin*np.dot(self.Win, state[self.rL])
         FR = np.sqrt(np.maximum(xR,0))
 
         self.dstate[self.rL] = (-state[self.rL] + FL) / self.tau   # oublié les tau?
         self.dstate[self.rR] = (-state[self.rR] + FR) / self.tau
 
         self.dstate[self.all_a] = (-state[self.all_a] + self.rho*state[self.all_r]) / self.taua # oublié tau?
-    
-        #self.dstate[self.all_muscles] = self.gmc*np.concatenate([np.matmul(self.Wcm,state[self.rL]),np.matmul(self.Wcm,state[self.rR])]) \
-        #                                        *(1-state[self.all_muscles])/self.taum_a-state[self.all_muscles]/self.taum_d
-        
-        self.dstate[self.muscle_l] = self.gmc * np.matmul(self.Wcm, state[self.rL]) \
+
+        self.dstate[self.muscle_l] = self.gmc * np.dot(self.Wcm, state[self.rL]) \
                                               * (1-state[self.muscle_l])/self.taum_a \
                                               - state[self.muscle_l]/self.taum_d
-        self.dstate[self.muscle_r] = self.gmc * np.matmul(self.Wcm, state[self.rR]) \
+        self.dstate[self.muscle_r] = self.gmc * np.dot(self.Wcm, state[self.rR]) \
                                         * (1-state[self.muscle_r])/self.taum_a \
                                         - state[self.muscle_r]/self.taum_d
-        if _time == 0.01:
-            d = 1       
-        if _time == 0.1:
-             d = 1
-        if _time == 0.49:
-            d = 1
-        if _time == 1:
-            d = 1
-        if _time == 1.5:
-            d = 1
-        if _time == 3:
-            d = 1
-        
-
+        if _time==1:
+            d=1
+        if _time==3:
+            d=1
         return self.dstate
 
 
