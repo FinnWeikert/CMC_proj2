@@ -236,19 +236,19 @@ class FiringRateController:
         """
         # Implement (11) here
         # coupling for rL
-        xL = self.I-self.b*state[self.aL]-self.gin*np.matmul(self.Win,state[self.rR])
-        FR = np.sqrt(np.maximum(xL,0))
+        xL = self.I - self.b*state[self.aL] - self.gin*np.matmul(self.Win, state[self.rR])
+        FL = np.sqrt(np.maximum(xL,0))
         # coupling for rR
-        xR = self.I-self.b*state[self.aR]-self.gin*np.matmul(self.Win,state[self.rL])
-        FL = np.sqrt(np.maximum(xR,0))
+        xR = self.I - self.b*state[self.aR] - self.gin*np.matmul(self.Win, state[self.rL])
+        FR = np.sqrt(np.maximum(xR,0))
 
         self.dstate[self.rL] = (-state[self.rL] + FL) / self.tau   # oublié les tau?
         self.dstate[self.rR] = (-state[self.rR] + FR) / self.tau
 
         self.dstate[self.all_a] = (-state[self.all_a] + self.rho*state[self.all_r]) / self.taua # oublié tau?
     
-        # self.dstate[self.all_muscles] = self.gmc*np.concatenate([np.matmul(self.Wcm,state[self.rL]),np.matmul(self.Wcm,state[self.rR])]) \
-        #                                         *(1-state[self.all_muscles])/self.taum_a-state[self.all_muscles]/self.taum_d
+        #self.dstate[self.all_muscles] = self.gmc*np.concatenate([np.matmul(self.Wcm,state[self.rL]),np.matmul(self.Wcm,state[self.rR])]) \
+        #                                        *(1-state[self.all_muscles])/self.taum_a-state[self.all_muscles]/self.taum_d
         
         self.dstate[self.muscle_l] = self.gmc * np.matmul(self.Wcm, state[self.rL]) \
                                               * (1-state[self.muscle_l])/self.taum_a \
@@ -259,7 +259,7 @@ class FiringRateController:
         if _time == 0.01:
             d = 1       
         if _time == 0.1:
-            d = 1
+             d = 1
         if _time == 0.49:
             d = 1
         if _time == 1:
