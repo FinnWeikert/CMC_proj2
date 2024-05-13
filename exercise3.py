@@ -81,5 +81,5 @@ def exercise3(**kwargs):
     )"""
 
 if __name__ == '__main__':
-    exercise3(headless=False)
+    exercise3(headless=False) # should be True in the end!
     plt.show()
