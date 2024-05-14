@@ -10,8 +10,8 @@ from plotting_common import save_figure, plot_left_right
 
 
 # READ: global parameters to defines what to run
-SINGLE_SIM = False # single sim with plots
-MULTIPLE_SIM = True # parameter search with square wave activations
+SINGLE_SIM = False # single sim with metrics output
+MULTIPLE_SIM = True # multiple sim with plots
 
 def exercise5():
 
@@ -21,7 +21,7 @@ def exercise5():
     os.makedirs(log_path, exist_ok=True)
 
     if SINGLE_SIM:
-        # Run an individual simulations with default parameters, visualize the swimming behavior and test its performance
+        # Run an individual simulations with default parameters
         all_pars = SimulationParameters(
             n_iterations=10001,
             compute_metrics=3,

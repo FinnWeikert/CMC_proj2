@@ -44,10 +44,13 @@ class FiringRateController:
         self.rR = self.rL + 1
         self.aL = 2*np.arange(self.n_neurons,self.n_neurons*2)
         self.aR = self.aL + 1
+        self.sL = 2*(np.arange(self.n_neurons*2,self.n_neurons*3)+self.n_muscle_cells)
+        self.sR = self.sL + 1
         #self.all_r = np.concatenate([self.rL,self.rR])
         #self.all_a = np.concatenate([self.aL,self.aR])
         self.all_r = np.arange(0, 2*self.n_neurons)
         self.all_a = 2*self.n_neurons + np.arange(0, 2*self.n_neurons)
+        self.all_s = 4*self.n_neurons + 2*self.n_muscle_cells + np.arange(0, 2*self.n_neurons)
 
         # muscle cells parameters
         self.n_joints = self.pars.n_joints
@@ -225,25 +228,43 @@ class FiringRateController:
         dstate: <np.array>
             Returns derivative of state
         """
+
         # Implement (11) here QUESTION: did they forget Idiff in (11)
-        # coupling for rL
-        xL = self.I + self.Idiff- self.b*state[self.aL] - self.gin*np.dot(self.Win.T, state[self.rR]) # Transpose is wierd...
+        # coupling for rL  (Transpose is wierd...)
+        xL = self.I + self.Idiff- self.b*state[self.aL] - self.w_inh*np.dot(self.Win.T, state[self.rR]) \
+             - self.w_stretch*np.dot(self.Wsc.T, state[self.sR]) # Transpose or not is the big question...
         FL = np.sqrt(np.maximum(xL,0))
         # coupling for rR
-        xR = self.I - self.Idiff - self.b*state[self.aR] - self.gin*np.dot(self.Win.T, state[self.rL])
+        xR = self.I - self.Idiff - self.b*state[self.aR] - self.w_inh*np.dot(self.Win.T, state[self.rL]) \
+             - self.w_stretch*np.dot(self.Wsc.T, state[self.sL]) # Transpose or not is the big question...
         FR = np.sqrt(np.maximum(xR,0))
 
+        # derivatives of the firing rates of the CPG neurons
         self.dstate[self.rL] = (-state[self.rL] + FL) / self.tau
         self.dstate[self.rR] = (-state[self.rR] + FR) / self.tau
 
-        self.dstate[self.all_a] = (-state[self.all_a] + self.rho*state[self.all_r]) / self.taua 
+        # derivatives of the firing rate adaptions
+        self.dstate[self.all_a] = (-state[self.all_a] + self.gamma*state[self.all_r]) / self.taua 
 
+        # derivatives of the muscle cell activities
         self.dstate[self.muscle_l] = self.gmc * np.dot(self.Wcm, state[self.rL]) \
                                               * (1-state[self.muscle_l])/self.taum_a \
                                               - state[self.muscle_l]/self.taum_d
         self.dstate[self.muscle_r] = self.gmc * np.dot(self.Wcm, state[self.rR]) \
                                         * (1-state[self.muscle_r])/self.taum_a \
                                         - state[self.muscle_r]/self.taum_d
+        
+        # ex 5 implementation                  !!! Pas sûr de cette implementation !!!
+        # Perform cubic spline interpolation
+        interp_func = CubicSpline(self.poses, pos)
+        # Compute interpolated joint angles at the positions of the 50 sensors
+        interpolated_joint_positions = interp_func(self.poses_ext)
+
+        # derivative of the strech sensory neurons
+        self.dstate[self.sL] = np.sqrt(np.maximum(interpolated_joint_positions,0)) \
+                                * (1 - state[self.sL]) - state[self.sL]
+        self.dstate[self.sR] = np.sqrt(np.maximum(-interpolated_joint_positions,0)) \
+                                * (1 - state[self.sR]) - state[self.sR]
         
         return self.dstate
 
