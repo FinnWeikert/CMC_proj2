@@ -40,8 +40,6 @@ class FiringRateController:
         # vector of indexes for the CPG activity variables - modify this
         # according to your implementation
         self.all_v = range(self.n_neurons*2)
-        pylog.warning(
-            "Implement here the vectorization indexed for the equation variables")
         self.rL = 2*np.arange(0,self.n_neurons)
         self.rR = self.rL + 1
         self.aL = 2*np.arange(self.n_neurons,self.n_neurons*2)
@@ -227,12 +225,12 @@ class FiringRateController:
         dstate: <np.array>
             Returns derivative of state
         """
-        # Implement (11) here
+        # Implement (11) here QUESTION: did they forget Idiff in (11)
         # coupling for rL
-        xL = self.I - self.b*state[self.aL] - self.gin*np.dot(self.Win.T, state[self.rR]) # Transpose is wierd...
+        xL = self.I + self.Idiff- self.b*state[self.aL] - self.gin*np.dot(self.Win.T, state[self.rR]) # Transpose is wierd...
         FL = np.sqrt(np.maximum(xL,0))
         # coupling for rR
-        xR = self.I - self.b*state[self.aR] - self.gin*np.dot(self.Win.T, state[self.rL])
+        xR = self.I - self.Idiff - self.b*state[self.aR] - self.gin*np.dot(self.Win.T, state[self.rL])
         FR = np.sqrt(np.maximum(xR,0))
 
         self.dstate[self.rL] = (-state[self.rL] + FL) / self.tau
