@@ -15,7 +15,7 @@ def exercise3(**kwargs):
     os.makedirs(log_path, exist_ok=True)
 
     all_pars = SimulationParameters(
-        n_iterations=10001,
+        n_iterations=3001,
         log_path=log_path,
         compute_metrics=3,
         return_network=True,
@@ -81,5 +81,5 @@ def exercise3(**kwargs):
     )"""
 
 if __name__ == '__main__':
-    exercise3(headless=False) # should be True in the end!
+    exercise3(headless=True) # should be True in the end!
     plt.show()

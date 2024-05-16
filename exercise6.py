@@ -23,11 +23,11 @@ def exercise6():
     if SINGLE_SIM:
         # Run an individual simulations with default parameters
         all_pars = SimulationParameters(
-            n_iterations=10001,
+            n_iterations=5001, # CHANGE to 10k at the end
             compute_metrics=3,
-            w_stretch=5,
+            w_stretch=7,
             return_network=True,
-            headless=False,
+            headless=True,
             print_metrics=True
         )
 
@@ -38,44 +38,46 @@ def exercise6():
 
         pylog.info("Plotting the result")
 
+        cutoff = 2000
+
         # muscle activities plot
         left_muscle_idx = controller.muscle_l
         right_muscle_idx = controller.muscle_r
         plt.figure('muscle_activities')
         plot_left_right(
-            controller.times,
-            controller.state,
-            left_muscle_idx,
-            right_muscle_idx,
-            cm="green",
-            offset=0.1)
+            controller.times[:cutoff],
+            controller.state[:cutoff],
+            left_muscle_idx[:cutoff],
+            right_muscle_idx[:cutoff],
+            offset=0.75)
         
         # CPG activities plot
         left_CPG_idx = controller.rL
         right_CPG_idx = controller.rR
         plt.figure('CPG_activities')
         plot_left_right(
-            controller.times,
-            controller.state,
-            left_CPG_idx,
-            right_CPG_idx,
-            cm="green",
-            offset=0.1)
+            controller.times[:cutoff],
+            controller.state[:cutoff],
+            left_CPG_idx[:cutoff],
+            right_CPG_idx[:cutoff],
+            offset=0.75)
         
         # sensory neurons plot 
         left_sens_idx = controller.sL
         right_sens_idx = controller.sR
         plt.figure('sensory_neurons_activities')
         plot_left_right(
-            controller.times,
-            controller.state,
-            left_sens_idx,
-            right_sens_idx,
-            cm="green",
-            offset=0.1)
+            controller.times[:cutoff],
+            controller.state[:cutoff],
+            left_sens_idx[:cutoff],
+            right_sens_idx[:cutoff],
+            offset=0.75)
 
+        jp = controller.joints_positions
+        d=1
         # +++ need to do joint angle positions plot
-        #plot_positions(controller.times, link_data)
+        # pos = np.array(self.data.sensors.joints.positions(iteration)[4:-1]) => from controller.py
+        # plot_positions(controller.times, controller.joints_positions)
 
 
     if MULTIPLE_SIM:

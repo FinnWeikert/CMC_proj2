@@ -27,9 +27,6 @@ class FiringRateController:
             self.n_iterations)
         self.pars = pars
 
-
-        self.test = []
-
         self.n_eq = self.n_neurons*4 + self.n_muscle_cells*2 + self.n_neurons * \
             2  # number of equations: number of CPG eq+muscle cells eq+sensors eq
         self.muscle_l = 4*self.n_neurons + 2 * \
@@ -104,6 +101,9 @@ class FiringRateController:
         ])  # active joint distances along the body (pos=0 is the tip of the head)
         self.poses_ext = np.linspace(
             self.poses[0], self.poses[-1], self.n_neurons)  # position of the sensors
+
+        # to keep track of the active join angles (for Ex6 angles posotions plot)
+        self.angle_poses = np.zeros((self.n_iterations, 10)) # added Finn (maybe other way makes more sense)
 
         # initialize ode solver
         self.f = self.ode_rhs
@@ -263,10 +263,10 @@ class FiringRateController:
             interpolated_joint_positions = interp_func(self.poses_ext)
 
             # derivative of the strech sensory neurons
-            self.dstate[self.sL] = np.sqrt(np.maximum(interpolated_joint_positions,0)) \
-                                    * (1 - state[self.sL]) - state[self.sL]
-            self.dstate[self.sR] = np.sqrt(np.maximum(-interpolated_joint_positions,0)) \
-                                    * (1 - state[self.sR]) - state[self.sR]
+            self.dstate[self.sL] = (np.sqrt(np.maximum(interpolated_joint_positions,0)) \
+                                    * (1 - state[self.sL]) - state[self.sL]) / self.tau_str
+            self.dstate[self.sR] = (np.sqrt(np.maximum(-interpolated_joint_positions,0)) \
+                                    * (1 - state[self.sR]) - state[self.sR] ) / self.tau_str
         
         return self.dstate
 
