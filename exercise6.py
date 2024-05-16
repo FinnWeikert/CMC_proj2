@@ -2,7 +2,7 @@
 
 from simulation_parameters import SimulationParameters
 from util.run_closed_loop import run_multiple, run_single
-from plotting_common import plot_left_right, plot_positions
+from plotting_common import plot_left_right, plot_time_histories_multiple_windows
 import numpy as np
 import matplotlib.pyplot as plt
 import farms_pylog as pylog
@@ -10,8 +10,8 @@ import os
 from util.rw import load_object
 
 # READ: global parameters to defines what to run
-SINGLE_SIM = True # single sim with metrics output
-MULTIPLE_SIM = False # multiple sim with plots
+SINGLE_SIM = False # single sim with metrics output
+MULTIPLE_SIM = True # multiple sim with plots
 
 def exercise6():
 
@@ -77,13 +77,22 @@ def exercise6():
         d=1
         # +++ need to do joint angle positions plot
         # pos = np.array(self.data.sensors.joints.positions(iteration)[4:-1]) => from controller.py
-        # plot_positions(controller.times, controller.joints_positions)
+        plt.figure("joint positions_single")
+        plot_time_histories_multiple_windows(
+            controller.times,
+            controller.joints_positions,
+            offset=-0.4,
+            colors="green",
+            ylabel="joint positions",
+            lw=1
+        )
+        # need to make this claener...
 
 
     if MULTIPLE_SIM:
         #Now vary gss ∈ [0,15], how does the frequency, wavefrequency and forward speed change?
 
-        nsim = 15  # Number of samples
+        nsim = 24  # Number of samples
         gss_list = np.linspace(0, 15, nsim)
 
         pylog.info(
@@ -128,8 +137,8 @@ def exercise6():
             fspeed_cycle_list.append(controller.metrics['fspeed_cycle'])
 
         fig1 = plt.figure('Frequencies',figsize=(10, 6))
-        plt.plot(gss_list, frequency_list, label='frequency', linewidth=2.5)
-        plt.plot(gss_list, wavefreq_list, label='wavefrequency', linewidth=2.5)
+        plt.plot(gss_list, frequency_list, label='frequency', linewidth=1.5)
+        plt.plot(gss_list, wavefreq_list, label='wavefrequency', linewidth=1.5)
         plt.xlabel('Stretch strength gss')
         plt.ylabel('[Hz]')
         plt.title('Frequency and Wavefrequency as Function of gss')

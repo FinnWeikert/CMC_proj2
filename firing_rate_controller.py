@@ -78,10 +78,10 @@ class FiringRateController:
         self.noise_sigma = self.pars.noise_sigma
 
         # Added by Tristan
-        self.gin = self.pars.gin
-        self.gss = self.pars.gss
+        #self.gin = self.pars.gin
+        #self.gss = self.pars.gss
         self.gmc = self.pars.gmc
-        self.rho = self.pars.rho
+        #self.rho = self.pars.rho
 
         self.state = np.zeros([self.n_iterations, self.n_eq])  # equation state
         self.dstate = np.zeros([self.n_eq])  # derivative state
@@ -101,9 +101,6 @@ class FiringRateController:
         ])  # active joint distances along the body (pos=0 is the tip of the head)
         self.poses_ext = np.linspace(
             self.poses[0], self.poses[-1], self.n_neurons)  # position of the sensors
-
-        # to keep track of the active join angles (for Ex6 angles posotions plot)
-        self.angle_poses = np.zeros((self.n_iterations, 10)) # added Finn (maybe other way makes more sense)
 
         # initialize ode solver
         self.f = self.ode_rhs
@@ -167,10 +164,18 @@ class FiringRateController:
         -------
         x_t{n+1}: <np.array>
             The solution x_t{n+1} of the Euler Maruyama scheme
-            x_new = x_prev-0.1*x_prev*dt+sigma*sqrt(dt)*Wiener
+            x_new = -0.1*x_prev*dt+sigma*sqrt(dt)*Wiener
         """
-
-        dx_process = np.zeros_like(x_prev)
+        # Generate Wiener process increments
+        dW = np.random.normal(0, np.sqrt(timestep), size=x_prev.shape)
+        
+        # Update the Ornstein-Uhlenbeck process using Euler-Maruyama scheme
+        dx_process = -0.1 * x_prev * timestep + sigma * dW
+        
+        # Apply the update to the previous state
+        x_new = x_prev + dx_process
+        
+        return x_new
 
     def step_euler(self, iteration, time, timestep, pos=None):
         """Euler step"""
@@ -195,6 +200,12 @@ class FiringRateController:
                    self.all_muscles] = np.maximum(self.state[iteration+1,
                                                              self.all_muscles],
                                                   0)  # prevent from negative muscle activations
+        
+        #DEBUG
+        state = self.state[iteration]
+        if iteration % 300 == 0:
+            d=1
+
         return np.concatenate([
             self.zeros8,  # the first 4 passive joints
             self.motor_output(iteration),  # the active joints
