@@ -2,11 +2,12 @@
 
 from simulation_parameters import SimulationParameters
 from util.run_closed_loop import run_multiple, run_single
-from plotting_common import plot_left_right
+from plotting_common import plot_left_right, plot_positions
 import numpy as np
 import matplotlib.pyplot as plt
 import farms_pylog as pylog
 import os
+from util.rw import load_object
 
 # READ: global parameters to defines what to run
 SINGLE_SIM = True # single sim with metrics output
@@ -74,10 +75,76 @@ def exercise6():
             offset=0.1)
 
         # +++ need to do joint angle positions plot
+        #plot_positions(controller.times, link_data)
+
 
     if MULTIPLE_SIM:
         #Now vary gss ∈ [0,15], how does the frequency, wavefrequency and forward speed change?
-        d = 1
+
+        nsim = 15  # Number of samples
+        gss_list = np.linspace(0, 15, nsim)
+
+        pylog.info(
+        "Running multiple simulations in parallel from a list of SimulationParameters")
+        pars_list = [
+            SimulationParameters(
+                simulation_i=i,
+                n_iterations=7501,
+                w_stretch = gss,
+                log_path=log_path,
+                video_record=False,
+                compute_metrics=3, # changed
+                headless=True,
+                print_metrics=False,
+                return_network=True
+            )
+            for i, gss in enumerate(gss_list)
+        ]
+
+        # check if this aprameter search was run before if so acces log
+        log_controlers = os.listdir("logs/exercise6/")
+        # Count the number of file
+        num_files = len(log_controlers)
+        
+        # if not corresponding number of simulations stored in logs, run the simulations
+        if num_files != nsim:
+            controllers = run_multiple(pars_list, num_process=8)
+        else: # load the simulations from logs
+            controllers = []
+            for i in range(nsim):
+                controllers.append(load_object("logs/exercise6/controller"+str(i)))
+
+        frequency_list = []
+        wavefreq_list = []
+        fspeed_PCA_list = []
+        fspeed_cycle_list = []
+
+        for i, controller in enumerate(controllers):
+            frequency_list.append(controller.metrics['frequency'])
+            wavefreq_list.append(controller.metrics['wavefrequency'])
+            fspeed_PCA_list.append(controller.metrics['fspeed_PCA'])
+            fspeed_cycle_list.append(controller.metrics['fspeed_cycle'])
+
+        fig1 = plt.figure('Frequencies',figsize=(10, 6))
+        plt.plot(gss_list, frequency_list, label='frequency', linewidth=2.5)
+        plt.plot(gss_list, wavefreq_list, label='wavefrequency', linewidth=2.5)
+        plt.xlabel('Stretch strength gss')
+        plt.ylabel('[Hz]')
+        plt.title('Frequency and Wavefrequency as Function of gss')
+        plt.legend(fontsize=10)  # Adjust legend size
+        plt.grid(True)
+
+        fig2 = plt.figure('Fspeed', figsize=(10, 6))
+        plt.plot(gss_list, fspeed_PCA_list, label='Fspeed PCA', linewidth=2.5)
+        plt.plot(gss_list, fspeed_cycle_list, label='Fspeed cylce', linewidth=2.5)
+        plt.xlabel('Stretch strength gss')
+        plt.ylabel('Speed')
+        plt.title('Forward speed as Function of gss')
+        plt.legend(fontsize=10)  # Adjust legend size
+        plt.grid(True)
+
+        # EXO: Les plots sont un peu bizarres => demander si ca fait du sens?
+
 if __name__ == '__main__':
     exercise6()
     plt.show()

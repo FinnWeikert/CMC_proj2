@@ -7,7 +7,6 @@ import farms_pylog as pylog
 import os
 from util.rw import load_object
 import matplotlib.pyplot as plt
-from plotting_common import save_figure, plot_trajectory, plot
 
 
 def exercise4():
@@ -68,7 +67,7 @@ def exercise4():
     plt.legend(fontsize=10)  # Adjust legend size
     plt.grid(True)
     # Add shaded region between the two vertical lines
-    plt.fill_betweenx(np.linspace(plt.gca().get_ylim()[0], plt.gca().get_ylim()[1], 100), 1, 25, color='lightgrey')
+    plt.fill_betweenx(np.linspace(plt.gca().get_ylim()[0], plt.gca().get_ylim()[1], 100), 1, 26, color='lightgrey')
     # Add text annotations for x-values at the level of the x-axis
     plt.text(1, plt.gca().get_ylim()[0]-0.02, 'I=1', ha='left', va='top', color='grey')
     plt.text(26, plt.gca().get_ylim()[0]-0.02, 'I=26', ha='left', va='top', color='grey')

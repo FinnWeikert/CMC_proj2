@@ -254,17 +254,19 @@ class FiringRateController:
                                         * (1-state[self.muscle_r])/self.taum_a \
                                         - state[self.muscle_r]/self.taum_d
         
-        # ex 5 implementation                  !!! Pas sûr de cette implementation !!!
+        # ex 6 implementation                  !!! Pas sûr de cette implementation !!!
         # Perform cubic spline interpolation
-        interp_func = CubicSpline(self.poses, pos)
-        # Compute interpolated joint angles at the positions of the 50 sensors
-        interpolated_joint_positions = interp_func(self.poses_ext)
+        if self.w_stretch != 0:
+            # self.poses is the actual position of the joints while pos is
+            interp_func = CubicSpline(self.poses, pos)
+            # Compute interpolated joint angles at the positions of the 50 sensors
+            interpolated_joint_positions = interp_func(self.poses_ext)
 
-        # derivative of the strech sensory neurons
-        self.dstate[self.sL] = np.sqrt(np.maximum(interpolated_joint_positions,0)) \
-                                * (1 - state[self.sL]) - state[self.sL]
-        self.dstate[self.sR] = np.sqrt(np.maximum(-interpolated_joint_positions,0)) \
-                                * (1 - state[self.sR]) - state[self.sR]
+            # derivative of the strech sensory neurons
+            self.dstate[self.sL] = np.sqrt(np.maximum(interpolated_joint_positions,0)) \
+                                    * (1 - state[self.sL]) - state[self.sL]
+            self.dstate[self.sR] = np.sqrt(np.maximum(-interpolated_joint_positions,0)) \
+                                    * (1 - state[self.sR]) - state[self.sR]
         
         return self.dstate
 
