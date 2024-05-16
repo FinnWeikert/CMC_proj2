@@ -3,11 +3,12 @@
 from simulation_parameters import SimulationParameters
 from util.run_closed_loop import run_multiple, run_single
 from plotting_common import plot_left_right, plot_time_histories_multiple_windows
+from plotting_common import plot_left_right
+from plotting_common import plot_time_histories_multiple_windows
 import numpy as np
 import matplotlib.pyplot as plt
 import farms_pylog as pylog
 import os
-from util.rw import load_object
 
 # READ: global parameters to defines what to run
 SINGLE_SIM = False # single sim with metrics output
@@ -88,6 +89,18 @@ def exercise6():
         )
         # need to make this claener...
 
+        joints_idx = controller.joints_positions
+        #fill the first joint with ones
+        #joints_idx[0] = 1
+        plt.figure("joint positions_single")
+        plot_time_histories_multiple_windows(
+            controller.times,
+            joints_idx,
+            offset=-0.4,
+            colors="green",
+            ylabel="joint positions",
+            lw=1
+        )
 
     if MULTIPLE_SIM:
         #Now vary gss ∈ [0,15], how does the frequency, wavefrequency and forward speed change?
@@ -156,7 +169,7 @@ def exercise6():
 
         # EXO: Les plots sont un peu bizarres => demander si ca fait du sens?
 
+        d = 1
 if __name__ == '__main__':
     exercise6()
     plt.show()
-
