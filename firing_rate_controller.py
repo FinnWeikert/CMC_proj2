@@ -194,7 +194,7 @@ class FiringRateController:
         self.state[iteration+1, :] = self.state[iteration, :] + \
             timestep*self.f(time, self.state[iteration], pos=pos)
         self.noise_vec = self.get_ou_noise_process_dw(
-            timestep, self.noise_vec, self.pars.noise_sigma)
+            timestep, self.noise_vec, self.pars.noise_sigma) # NO time const?? tau not compatible with eq. 14
         self.state[iteration+1, self.all_v] += self.noise_vec
         self.state[iteration+1,
                    self.all_muscles] = np.maximum(self.state[iteration+1,
