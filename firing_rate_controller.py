@@ -164,16 +164,16 @@ class FiringRateController:
         -------
         x_t{n+1}: <np.array>
             The solution x_t{n+1} of the Euler Maruyama scheme
-            x_new = -0.1*x_prev*dt+sigma*sqrt(dt)*Wiener
+            x_new = -0.1*x_prev*dt+sigma*sqrt(dt)*Wiener 
         """
         # Generate Wiener process increments
         dW = np.random.normal(0, np.sqrt(timestep), size=x_prev.shape)
         
         # Update the Ornstein-Uhlenbeck process using Euler-Maruyama scheme
-        dx_process = -0.1 * x_prev * timestep + sigma * dW
+        x_new = -0.1 * x_prev * timestep + sigma * dW
         
         # Apply the update to the previous state
-        x_new = x_prev + dx_process
+        # x_new = x_prev + dx_process
         
         return x_new
 
