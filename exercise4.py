@@ -123,6 +123,7 @@ def exercise4():
         controllers_tresh = run_multiple(pars_list_tresh, num_process=8)
 
         ptcc_list_tresh = [controller.metrics['ptcc'] for controller in controllers_tresh]
+        #print(ptcc_list_tresh)
 
         tresh = 1.5
         tresh_I = None
@@ -132,6 +133,9 @@ def exercise4():
             tresh_I = I_list_tresh[i]
 
         print(tresh_I)
+
+        plt.figure('tresh',figsize=(10, 6))
+        plt.plot(I_list_tresh, ptcc_list_tresh, linewidth=3)
 
 if __name__ == '__main__':
     exercise4()
