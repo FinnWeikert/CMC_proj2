@@ -16,7 +16,7 @@ def exercise8():
     log_path = './logs/exercise8/'
     os.makedirs(log_path, exist_ok=True)
 
-    nsim = 1
+    nsim = 10
     # Lists to store amplitudes and wave frequencies per sim
     sigma_list = []
     gss_list = []
@@ -31,9 +31,9 @@ def exercise8():
             log_path=log_path,
             video_record=False,
             compute_metrics=3, # changed
-            w_stretch=2, # debug
-            noise_sigma=5, # debug
-            headless=False,
+            w_stretch=gss,
+            noise_sigma=sigma,
+            headless=True,
             print_metrics=False,
             return_network=True # added
         )
@@ -48,8 +48,8 @@ def exercise8():
     num_files = len(log_controlers)
 
     # if not corresponding number of simulations stored in logs, run the simulations
-    if num_files != 10*nsim**2: # DEBUG
-        controllers = run_multiple(pars_list, num_process=1)
+    if num_files != nsim**2:
+        controllers = run_multiple(pars_list, num_process=8)
     else: # load the simulations from logs
         controllers = []
         for i in range(nsim**2):
@@ -99,4 +99,4 @@ def exercise8():
     d = 1 # debug
 if __name__ == '__main__':
     exercise8()
-
+    plt.show()
