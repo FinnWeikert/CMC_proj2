@@ -10,8 +10,8 @@ import os
 from util.rw import load_object
 
 # READ: global parameters to defines what to run
-SINGLE_SIM = False # single sim with metrics output
-MULTIPLE_SIM = True # multiple sim with plots
+SINGLE_SIM = True # single sim with metrics output
+MULTIPLE_SIM = False # multiple sim with plots
 
 def exercise6():
 
@@ -92,7 +92,7 @@ def exercise6():
     if MULTIPLE_SIM:
         #Now vary gss ∈ [0,15], how does the frequency, wavefrequency and forward speed change?
 
-        nsim = 24  # Number of samples
+        nsim = 40  # Number of samples
         gss_list = np.linspace(0, 15, nsim)
 
         pylog.info(
@@ -147,7 +147,7 @@ def exercise6():
 
         fig2 = plt.figure('Fspeed', figsize=(10, 6))
         plt.plot(gss_list, fspeed_PCA_list, label='Fspeed PCA', linewidth=2.5)
-        plt.plot(gss_list, fspeed_cycle_list, label='Fspeed cylce', linewidth=2.5)
+        #plt.plot(gss_list, fspeed_cycle_list, label='Fspeed cylce', linewidth=2.5)
         plt.xlabel('Stretch strength gss')
         plt.ylabel('Speed')
         plt.title('Forward speed as Function of gss')
