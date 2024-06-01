@@ -6,12 +6,12 @@ import farms_pylog as pylog
 import os
 from util.rw import load_object
 import matplotlib.pyplot as plt
-from plotting_common import save_figure, plot_left_right
+from plotting_common import save_figure, plot_left_right, plot_time_histories, plot_time_histories_multiple_windows
 
 
 # READ: global parameters to defines what to run
-SINGLE_SIM = False # single sim with metrics output
-MULTIPLE_SIM = True # multiple sim with plots
+SINGLE_SIM = True # single sim with metrics output
+MULTIPLE_SIM = False # multiple sim with plots
 
 def exercise5():
 
@@ -33,6 +33,30 @@ def exercise5():
         pylog.info("Running the simulation")
         controller = run_single(
             all_pars
+        )
+
+        cutoff = 3000
+        cmap = plt.get_cmap('rainbow')
+        colors = [cmap(i) for i in np.linspace(0, 1, 15)]
+        joint_labels = ["joint " + str(i+1) for i in range(15)]
+        plt.figure("joint positions_single")
+        plot_time_histories_multiple_windows(
+            controller.times[:cutoff],
+            controller.joints_positions[:cutoff],
+            colors=colors,
+            ylabel="joint positions",
+            labels=joint_labels,
+            lw=1
+        )
+
+        plt.figure("link y-velocities_single")
+        plot_time_histories(
+            controller.times[:cutoff],
+            controller.links_velocities[:cutoff, :cutoff, 1],
+            offset=-0.,
+            #colors="green",
+            ylabel="link y-velocities",
+            lw=1
         )
         # !!! ASK: Test its performance is just to look at the metrics from print metrics ? maybe plot some stuff...
 

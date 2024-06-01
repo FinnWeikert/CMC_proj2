@@ -63,7 +63,7 @@ def exercise4():
     plt.plot(I_list, ptcc_list, linewidth=3)
     plt.xlabel('input I')
     plt.ylabel('ptcc')
-    plt.title('Peak to Peak Correlation as Function of I')
+    plt.title('Peak-to-Through Correlation as Function of I')
     plt.legend(fontsize=10)  # Adjust legend size
     plt.grid(True)
     # Add shaded region between the two vertical lines
@@ -134,8 +134,8 @@ def exercise4():
 
         print(tresh_I)
 
-        plt.figure('tresh',figsize=(10, 6))
-        plt.plot(I_list_tresh, ptcc_list_tresh, linewidth=3)
+        #plt.figure('tresh',figsize=(10, 6))
+        #plt.plot(I_list_tresh, ptcc_list_tresh, linewidth=3)
 
 if __name__ == '__main__':
     exercise4()
