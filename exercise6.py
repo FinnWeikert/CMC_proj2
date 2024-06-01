@@ -23,9 +23,9 @@ def exercise6():
     if SINGLE_SIM:
         # Run an individual simulations with default parameters
         all_pars = SimulationParameters(
-            n_iterations=5001, # CHANGE to 10k at the end
+            n_iterations=3001, # CHANGE to 10k at the end
             compute_metrics=3,
-            w_stretch=7,
+            w_stretch=4,
             return_network=True,
             headless=True,
             print_metrics=True
@@ -47,8 +47,8 @@ def exercise6():
         plot_left_right(
             controller.times[:cutoff],
             controller.state[:cutoff],
-            left_muscle_idx[:cutoff],
-            right_muscle_idx[:cutoff],
+            left_muscle_idx,
+            right_muscle_idx,
             offset=0.75)
         
         # CPG activities plot
@@ -58,8 +58,8 @@ def exercise6():
         plot_left_right(
             controller.times[:cutoff],
             controller.state[:cutoff],
-            left_CPG_idx[:cutoff],
-            right_CPG_idx[:cutoff],
+            left_CPG_idx,
+            right_CPG_idx,
             offset=0.75)
         
         # sensory neurons plot 
@@ -69,24 +69,22 @@ def exercise6():
         plot_left_right(
             controller.times[:cutoff],
             controller.state[:cutoff],
-            left_sens_idx[:cutoff],
-            right_sens_idx[:cutoff],
+            left_sens_idx,
+            right_sens_idx,
             offset=0.75)
 
-        jp = controller.joints_positions
-        d=1
-        # +++ need to do joint angle positions plot
-        # pos = np.array(self.data.sensors.joints.positions(iteration)[4:-1]) => from controller.py
+        cmap = plt.get_cmap('rainbow')
+        colors = [cmap(i) for i in np.linspace(0, 1, 15)]
+        joint_labels = ["joint " + str(i+1) for i in range(15)]
         plt.figure("joint positions_single")
         plot_time_histories_multiple_windows(
-            controller.times,
-            controller.joints_positions,
-            offset=-0.4,
-            colors="green",
+            controller.times[:cutoff],
+            controller.joints_positions[:cutoff],
+            colors=colors,
             ylabel="joint positions",
+            labels=joint_labels,
             lw=1
         )
-        # need to make this claener...
 
 
     if MULTIPLE_SIM:

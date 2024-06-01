@@ -15,7 +15,7 @@ def exercise3(**kwargs):
     os.makedirs(log_path, exist_ok=True)
 
     all_pars = SimulationParameters(
-        n_iterations=3001,
+        n_iterations=10001,
         log_path=log_path,
         compute_metrics=3,
         return_network=True,
@@ -29,30 +29,42 @@ def exercise3(**kwargs):
 
     pylog.info("Plotting the result")
 
+    cutoff = 2000
     left_muscle_idx = controller.muscle_l
     right_muscle_idx = controller.muscle_r
 
     # example plot using plot_left_right
     plt.figure('muscle_activities')
     plot_left_right(
-        controller.times,
-        controller.state,
+        controller.times[:cutoff],
+        controller.state[:cutoff],
         left_muscle_idx,
         right_muscle_idx,
-        cm="green",
-        offset=0.1)
+        offset=1)
     
     left_CPG_idx = controller.rL
     right_CPG_idx = controller.rR
 
     plt.figure('CPG_activities')
     plot_left_right(
-        controller.times,
-        controller.state,
+        controller.times[:cutoff],
+        controller.state[:cutoff],
         left_CPG_idx,
         right_CPG_idx,
-        cm="green",
-        offset=0.1)
+        offset=0.8)
+    
+    cmap = plt.get_cmap('rainbow')
+    colors = [cmap(i) for i in np.linspace(0, 1, 15)]
+    joint_labels = ["joint " + str(i+1) for i in range(15)]
+    plt.figure("joint positions_single")
+    plot_time_histories_multiple_windows(
+        controller.times[:cutoff],
+        controller.joints_positions[:cutoff],
+        colors=colors,
+        ylabel="joint positions",
+        labels=joint_labels,
+        lw=1
+    )
 
     """# example plot using plot_trajectory
     plt.figure("trajectory_single")
