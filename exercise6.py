@@ -23,7 +23,7 @@ def exercise6():
     if SINGLE_SIM:
         # Run an individual simulations with default parameters
         all_pars = SimulationParameters(
-            n_iterations=3001, # CHANGE to 10k at the end
+            n_iterations=10001, # CHANGE to 10k at the end
             compute_metrics=3,
             w_stretch=4,
             return_network=True,
@@ -49,7 +49,7 @@ def exercise6():
             controller.state[:cutoff],
             left_muscle_idx,
             right_muscle_idx,
-            offset=0.75)
+            offset=0.8)
         
         # CPG activities plot
         left_CPG_idx = controller.rL
@@ -60,7 +60,7 @@ def exercise6():
             controller.state[:cutoff],
             left_CPG_idx,
             right_CPG_idx,
-            offset=0.75)
+            offset=0.8)
         
         # sensory neurons plot 
         left_sens_idx = controller.sL
@@ -71,7 +71,7 @@ def exercise6():
             controller.state[:cutoff],
             left_sens_idx,
             right_sens_idx,
-            offset=0.75)
+            offset=0.3)
 
         cmap = plt.get_cmap('rainbow')
         colors = [cmap(i) for i in np.linspace(0, 1, 15)]
@@ -125,22 +125,41 @@ def exercise6():
 
         frequency_list = []
         wavefreq_list = []
+        amplitude_list = []
         fspeed_PCA_list = []
         fspeed_cycle_list = []
 
         for i, controller in enumerate(controllers):
             frequency_list.append(controller.metrics['frequency'])
             wavefreq_list.append(controller.metrics['wavefrequency'])
+            amplitude_list.append(controller.metrics['amp'])
             fspeed_PCA_list.append(controller.metrics['fspeed_PCA'])
             fspeed_cycle_list.append(controller.metrics['fspeed_cycle'])
 
-        fig1 = plt.figure('Frequencies',figsize=(10, 6))
-        plt.plot(gss_list, frequency_list, label='frequency', linewidth=1.5)
-        plt.plot(gss_list, wavefreq_list, label='wavefrequency', linewidth=1.5)
-        plt.xlabel('Stretch strength gss')
-        plt.ylabel('[Hz]')
+
+        fig1, ax1 = plt.subplots(figsize=(10, 6))
+
+        # Plot frequency on primary y-axis (left)
+        color = 'tab:blue'
+        ax1.set_xlabel('Stretch strength gss')
+        ax1.set_ylabel('Freqeuncy [Hz]', color=color)
+        ax1.plot(gss_list, frequency_list, color=color, label='frequency', linewidth=2)
+        ax1.tick_params(axis='y', labelcolor=color)
+
+        # Create a secondary y-axis and plot lspeed on it (right)
+        ax2 = ax1.twinx()  
+        color = 'tab:red'
+        ax2.set_ylabel('Wavefrequency [Hz]', color=color)
+        ax2.plot(gss_list, wavefreq_list, color=color, label='wavefrequency', linewidth=2)  
+        ax2.tick_params(axis='y', labelcolor=color)
+
+        # Add legend
+        lines1, labels1 = ax1.get_legend_handles_labels()
+        lines2, labels2 = ax2.get_legend_handles_labels()
+        ax1.legend(lines1 + lines2, labels1 + labels2, loc='best', fontsize=13)
+
+        fig1.tight_layout()  
         plt.title('Frequency and Wavefrequency as Function of gss')
-        plt.legend(fontsize=10)  # Adjust legend size
         plt.grid(True)
 
         fig2 = plt.figure('Fspeed', figsize=(10, 6))
