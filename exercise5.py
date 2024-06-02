@@ -6,7 +6,7 @@ import farms_pylog as pylog
 import os
 from util.rw import load_object
 import matplotlib.pyplot as plt
-from plotting_common import save_figure, plot_left_right, plot_time_histories, plot_time_histories_multiple_windows
+from plotting_common import plot_trajectory, plot_left_right, plot_time_histories, plot_time_histories_multiple_windows
 
 
 # READ: global parameters to defines what to run
@@ -16,7 +16,6 @@ MULTIPLE_SIM = False # multiple sim with plots
 def exercise5():
 
     pylog.info("Ex 5")
-    pylog.info("Implement exercise 5")
     log_path = './logs/exercise5/'
     os.makedirs(log_path, exist_ok=True)
 
@@ -26,7 +25,7 @@ def exercise5():
             n_iterations=10001,
             compute_metrics=3,
             return_network=True,
-            headless=False,
+            headless=True,
             print_metrics=True
         )
 
@@ -34,8 +33,12 @@ def exercise5():
         controller = run_single(
             all_pars
         )
+        
+        plt.figure("trajectory_single")
+        plot_trajectory(controller, sim_fraction=0.2)
 
-        cutoff = 3000
+        # Note: for some reason need headless=False for this to plot correctly!
+        cutoff = 2000
         cmap = plt.get_cmap('rainbow')
         colors = [cmap(i) for i in np.linspace(0, 1, 15)]
         joint_labels = ["joint " + str(i+1) for i in range(15)]
@@ -58,7 +61,7 @@ def exercise5():
             ylabel="link y-velocities",
             lw=1
         )
-        # !!! ASK: Test its performance is just to look at the metrics from print metrics ? maybe plot some stuff...
+
 
     if MULTIPLE_SIM:
 
