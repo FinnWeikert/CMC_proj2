@@ -12,7 +12,6 @@ from plotting_common import plot_2d
 def exercise8():
 
     pylog.info("Ex 8")
-    pylog.info("Implement exercise 8")
     log_path = './logs/exercise8/'
     os.makedirs(log_path, exist_ok=True)
 
@@ -26,7 +25,7 @@ def exercise8():
     pars_list = [
         SimulationParameters(
             simulation_i=i*nsim+j,
-            n_iterations=5001, # maybe this should be a bit larger to make sure intitial cond effect vanish
+            n_iterations=5001, 
             method="noise",
             log_path=log_path,
             video_record=False,
@@ -63,6 +62,7 @@ def exercise8():
     # 2d array of dimension [N, 3], N = number of controllers
     # first col: amps, second: wavefreq, and last: speed
     para_search_results_PCA = np.zeros((len(controllers), 3))
+    para_search_results_ptcc = np.zeros((len(controllers), 3))
 
     # parameter search for highest amp and wavefrequency with highest speed
     for i, controller in enumerate(controllers):
@@ -71,11 +71,16 @@ def exercise8():
         sigma = sigma_list[controller.pars.simulation_i]
         gss = gss_list[controller.pars.simulation_i]
         fspeed_PCA = controller.metrics['fspeed_PCA']
+        ptcc = controller.metrics['ptcc']
 
         # store the parameters and corresponding speed in results array
         para_search_results_PCA[i][0] = sigma
         para_search_results_PCA[i][1] = gss
         para_search_results_PCA[i][2] = fspeed_PCA
+
+        para_search_results_ptcc[i][0] = sigma
+        para_search_results_ptcc[i][1] = gss
+        para_search_results_ptcc[i][2] = ptcc
 
         # fspeed PCA
         if fspeed_PCA > optim_para[0]:
@@ -87,14 +92,21 @@ def exercise8():
     # Print debug info
     d = 1  # debug
 
+    print("An optimal Forward speed of", optim_para[0],"is reached for a stretch feedback strenght of", optim_para[2])
     # Plot the results
     # Plot the heat map of the parameter search (using plot2d)
     labels = ['Noise sigma', 'Feedback strength', 'Forward speed (PCA)']
-
     plt.figure('2D Parameter Search PCA Fspeed', figsize=[10, 10])
     plot_2d(para_search_results_PCA, labels, cmap='nipy_spectral')  # can maybe find nicer cmap='coolwarm' or other
     plt.title('2D Parameter Search PCA Fspeed')
-    plt.show()
+
+    labels = ['Noise sigma', 'Feedback strength', 'PTCC']
+    plt.figure('2D Parameter Search PTCC', figsize=[10, 10])
+    plot_2d(para_search_results_ptcc, labels, cmap='nipy_spectral')
+    plt.title('2D Parameter Search ptcc')
+
+
+    #plt.show()
 
     d = 1 # debug
 if __name__ == '__main__':

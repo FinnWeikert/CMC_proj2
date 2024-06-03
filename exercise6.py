@@ -27,7 +27,7 @@ def exercise6():
             compute_metrics=3,
             w_stretch=4,
             return_network=True,
-            headless=True,
+            headless=False,
             print_metrics=True
         )
 
