@@ -10,8 +10,9 @@ from plotting_common import plot_trajectory, plot_left_right, plot_time_historie
 
 
 # READ: global parameters to defines what to run
-SINGLE_SIM = True # single sim with metrics output
-MULTIPLE_SIM = False # multiple sim with plots
+SINGLE_SIM = False      # single sim with metrics output
+MULTIPLE_SIM = True     # multiple simulation for Figure 8 in pdf
+SIMCURVE = False        # muliple simulaiton for Figures 9 & 10 in pdf
 
 def exercise5():
 
@@ -25,7 +26,7 @@ def exercise5():
             n_iterations=10001,
             compute_metrics=3,
             return_network=True,
-            headless=True,
+            headless=False,
             print_metrics=True
         )
 
@@ -112,10 +113,11 @@ def exercise5():
 
         # Plot curvature on primary y-axis (left)
         color = 'tab:blue'
-        ax1.set_xlabel('differential drive I_diff')
+        ax1.set_xlabel('Differential drive $I_{{diff}}$')
         ax1.set_ylabel('Curvature', color=color)
         ax1.plot(Idiff_list, curvature_list, color=color, label='Curvature', linewidth=2)
-        ax1.tick_params(axis='y', labelcolor=color)
+        ax1.tick_params(axis='y', labelcolor=color, labelsize=12)
+        ax1.tick_params(axis='x', labelsize=12)  # Smaller font size for x-axis values
 
         # Create a secondary y-axis and plot lspeed on it (right)
         ax2 = ax1.twinx()  
@@ -124,6 +126,8 @@ def exercise5():
         ax2.plot(Idiff_list, lspeed_PCA_list, color=color, label='Lspeed_PCA', linewidth=2)
         ax2.plot(Idiff_list, lspeed_cycle_list, color='orange', label='Lspeed_Cycle', linewidth=2)  # Adding lspeed_cycle
         ax2.tick_params(axis='y', labelcolor=color)
+        ax2.tick_params(axis='y', labelcolor=color, labelsize=12)  # Smaller font size for y-axis values on ax2
+
 
         # Add legend
         lines1, labels1 = ax1.get_legend_handles_labels()
@@ -131,7 +135,7 @@ def exercise5():
         ax1.legend(lines1 + lines2, labels1 + labels2, loc='best', fontsize=10)
 
         fig1.tight_layout()  
-        plt.title('Curvature and Lateral Speed as Function of I_diff')
+        plt.title('Curvature and Lateral Speed as Function of $I_{{diff}}$',fontsize=14)
         plt.grid(True)
         #plt.show()
 
@@ -229,8 +233,6 @@ def exercise5():
             cm="green",
             offset=0.1)
         
-
-# Mieux si on ajoute savefig...
 
 if __name__ == '__main__':
     exercise5()

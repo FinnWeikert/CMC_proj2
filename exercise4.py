@@ -97,8 +97,6 @@ def exercise4():
     # save_figure(fig2, dir='results/ex4')
     # plt.show()
 
-    # FINIS, sauf save_figure marche pas!
-
 
     # To find the exact thersholds passing values
     find_tresh = False

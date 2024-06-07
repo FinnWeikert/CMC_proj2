@@ -10,8 +10,8 @@ import os
 from util.rw import load_object
 
 # READ: global parameters to defines what to run
-SINGLE_SIM = True # single sim with metrics output
-MULTIPLE_SIM = False # multiple sim with plots
+SINGLE_SIM = True       # single sim with plots for Figure 11 in pdf
+MULTIPLE_SIM = False    # multiple sim with plots for Figure 12 in pdf
 
 def exercise6():
 
@@ -170,8 +170,6 @@ def exercise6():
         plt.title('Forward speed as Function of gss')
         plt.legend(fontsize=10)  # Adjust legend size
         plt.grid(True)
-
-        # EXO: Les plots sont un peu bizarres => demander si ca fait du sens?
 
 if __name__ == '__main__':
     exercise6()
