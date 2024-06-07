@@ -22,15 +22,5 @@ rad.json
 TestResults.xml
 .DS_Store
 *.pyc
-example_multiple.py
-example_single.py
-farms_amphibious/
-farms_core/
-farms_sim/
-farms_mujoco/
 logs/
-models/
-muscle_parameters/
-util/
-requirements.txt
 setup_sim_env.py
