@@ -1,1 +1,1 @@
-# CMC_proj2
+# Computational Motor Control Project 2
